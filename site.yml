@@ -1,0 +1,7 @@
+- name: Provision FX Pedal
+  hosts: all
+  become: true
+
+  roles:
+    - { role: common, tags: [common] }
+    - { role: guitarix, tags: [guitarix] }

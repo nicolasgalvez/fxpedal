@@ -1,0 +1,40 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/common
+- name: Install base packages
+  apt:
+    name: ['curl', 'git', 'htop', 'zsh']
+    state: present
+    update_cache: yes
+
+- name: Change default shell to zsh
+  user:
+    name: "{{ ansible_user }}"
+    shell: /usr/bin/zsh
+  become: true
+
+- name: Check if Oh My Zsh is already installed
+  stat:
+    path: "/home/{{ ansible_user }}/.oh-my-zsh"
+  register: ohmyzsh_dir
+
+- name: Install Oh My Zsh for user
+  become: true
+  become_user: "{{ ansible_user }}"
+  shell: |
+    export RUNZSH=no
+    export CHSH=no
+    export HOME=$(getent passwd "{{ ansible_user }}" | cut -d: -f6)
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  args:
+    executable: /bin/bash
+  when: not ohmyzsh_dir.stat.exists
+
+- name: Allow passwordless sudo for current user
+  copy:
+    dest: "/etc/sudoers.d/{{ ansible_user }}"
+    content: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
+    owner: root
+    group: root
+    mode: '0440'
+  become: true

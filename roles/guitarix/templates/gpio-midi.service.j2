@@ -1,0 +1,13 @@
+[Unit]
+Description=GPIO MIDI Button for Guitarix
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/{{ guitarix_user }}/gpio_button_midi.py
+Restart=always
+User={{ guitarix_user }}
+Environment=DISPLAY=:0
+WorkingDirectory=/home/{{ guitarix_user }}
+
+[Install]
+WantedBy=multi-user.target

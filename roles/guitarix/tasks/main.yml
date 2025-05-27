@@ -1,0 +1,50 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for guitarix
+- name: Ensure dependencies are installed
+  apt:
+    name:
+      - python3-rpi.gpio
+      - python3-pip
+      - build-essential
+      - libasound2-dev
+      - git
+      - guitarix
+      - cmake
+    state: present
+    update_cache: yes
+
+- name: Clone and install sendmidi
+  git:
+    repo: https://github.com/gbevin/SendMIDI.git
+    dest: /home/{{ ansible_user }}/SendMIDI
+    force: yes
+
+- name: Build sendmidi
+  make:
+    chdir: /home/{{ ansible_user }}/SendMIDI/Builds/LinuxMakefile
+
+- name: Copy sendmidi binary
+  copy:
+    src: /home/{{ ansible_user }}/SendMIDI/sendmidi
+    dest: /usr/local/bin/sendmidi
+    mode: '0755'
+
+- name: Deploy GPIO control script
+  template:
+    src: gpio_button_midi.py
+    dest: /home/{{ ansible_user }}/gpio_button_midi.py
+    mode: '0755'
+
+- name: Create systemd service
+  template:
+    src: gpio-midi.service.j2
+    dest: /etc/systemd/system/gpio-midi.service
+    mode: '0644'
+
+- name: Enable and start gpio-midi service
+  systemd:
+    name: gpio-midi.service
+    enabled: true
+    state: started
+    daemon_reload: yes
