@@ -1,0 +1,29 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# macOS Trash
+.Trashes
+
+# macOS Spotlight
+.Spotlight-V100
+
+# macOS metadata
+.fseventsd
+
+# Ansible specific
+*.retry
+*.log
+*.pyc
+__pycache__/
+inventory.ini
+*.vault
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
